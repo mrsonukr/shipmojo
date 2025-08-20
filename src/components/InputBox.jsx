@@ -236,7 +236,8 @@ export default function InputBox({
       lineHeight: "42px",
     },
     "& .MuiSelect-icon": {
-      display: "none", // 🔥 hide the arrow icon
+      color: "#6b7280",
+      fontSize: "20px",
     },
     // Force override Material-UI's default focus styles with !important
     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {

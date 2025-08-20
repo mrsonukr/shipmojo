@@ -1,13 +1,9 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CircularProgress } from '@mui/material'
-import { SquareArrowOutUpRight } from 'lucide-react'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { Pagination, Autoplay } from 'swiper/modules'
-import 'swiper/css'
-import 'swiper/css/pagination'
 import InputBox from '../components/InputBox'
 import Button from '../components/Button'
+import AuthLayout from '../components/AuthLayout'
 
 const Register = () => {
   const navigate = useNavigate()
@@ -72,96 +68,10 @@ const Register = () => {
   }
 
   return (
-    <div className="h-screen bg-[#CEE5ED] flex overflow-hidden">
-      {/* Left Section - Slider */}
-      <div className="hidden lg:flex lg:w-[55%] bg-[#CEE5ED] relative">
-        {/* Logo */}
-        <div className="absolute top-4 left-4 z-10 flex items-center">
-          <img
-            src="https://panel.shipmozo.com/images/logos/logo.svg"
-            alt="Shipmozo Logo"
-            className="h-8 w-auto"
-          />
-        </div>
-
-        {/* Slider */}
-        <Swiper
-          modules={[Pagination, Autoplay]}
-          pagination={{
-            clickable: true,
-          }}
-          autoplay={{
-            delay: 3000,
-            disableOnInteraction: false,
-          }}
-          loop={true}
-          className="w-full h-full"
-        >
-          <SwiperSlide>
-            <div className="flex items-center justify-center h-full">
-              <img
-                src="https://panel.shipmozo.com/images/slider/1.svg"
-                alt="Slider 1"
-                className="w-auto h-[80vh] object-contain"
-              />
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="flex items-center justify-center h-full">
-              <img
-                src="https://panel.shipmozo.com/images/slider/2.svg"
-                alt="Slider 2"
-                className="w-auto h-[80vh] object-contain"
-              />
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="flex items-center justify-center h-full">
-              <img
-                src="https://panel.shipmozo.com/images/slider/3.svg"
-                alt="Slider 3"
-                className="w-auto h-[80vh] object-contain"
-              />
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="flex items-center justify-center h-full">
-              <img
-                src="https://panel.shipmozo.com/images/slider/4.svg"
-                alt="Slider 4"
-                className="w-auto h-[80vh] object-contain"
-              />
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="flex items-center justify-center h-full">
-              <img
-                src="https://panel.shipmozo.com/images/slider/5.svg"
-                alt="Slider 5"
-                className="w-auto h-[80vh] object-contain"
-              />
-            </div>
-          </SwiperSlide>
-        </Swiper>
-      </div>
-
-      {/* Right Section - Register Form */}
-      <div className="w-full lg:w-[45%] bg-white flex items-start justify-center p-8 overflow-y-auto">
-        <div className="w-full max-w-md">
-          {/* Mobile Logo */}
-          <div className="lg:hidden flex items-center mb-8">
-            <img
-              src="https://panel.shipmozo.com/images/logos/logo.svg"
-              alt="Shipmozo Logo"
-              className="h-8 w-auto"
-            />
-          </div>
-
-          {/* Form Header */}
-          <div className="mb-8">
-            <h1 className="text-[21px] font-bold text-gray-800 mb-1">Register to Shipmozo</h1>
-            <p className="text-gray-600 text-xs">Register to start using Shipmozo.</p>
-          </div>
+    <AuthLayout 
+      title="Register to Shipmozo"
+      subtitle="Register to start using Shipmozo."
+    >
 
           {/* Register Form */}
           <div className="space-y-6">
@@ -220,24 +130,16 @@ const Register = () => {
               required={true}
             />
 
-                         {/* Confirm Password */}
-             <div>
-               <label className="block text-xs font-medium text-gray-700 mb-2">
-                 Confirm Password <span className="text-red-500">*</span>
-               </label>
-               <input
-                 type="password"
-                 value={confirmPassword}
-                 onChange={(e) => setConfirmPassword(e.target.value)}
-                 placeholder="Re-enter your password"
-                 className={`w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${
-                   confirmPasswordError ? 'border-red-500' : 'border-gray-300'
-                 }`}
-               />
-               {confirmPasswordError && (
-                 <p className="text-red-500 text-xs mt-1">Passwords do not match</p>
-               )}
-             </div>
+            {/* Confirm Password */}
+            <InputBox
+              type="confirmPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              error={confirmPasswordError}
+              onErrorChange={setConfirmPasswordError}
+              required={true}
+              showPasswordToggle={false}
+            />
 
             {/* Terms and Conditions */}
             <div className="flex items-start space-x-2">
@@ -278,7 +180,7 @@ const Register = () => {
             </Button>
 
             {/* Login Link */}
-            <div className="text-xs font-medium mt-3 text-center">
+            <div className="text-xs font-medium mt-3">
               <span className="text-gray-600">Already have an account? </span>
               <button
                 onClick={handleLogin}
@@ -303,10 +205,8 @@ const Register = () => {
                </button>
              </div>
            </div>
-        </div>
-      </div>
-    </div>
-  )
+        </AuthLayout>
+      )
 }
 
 export default Register
