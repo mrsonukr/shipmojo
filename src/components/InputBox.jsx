@@ -8,6 +8,7 @@ import {
   MenuItem,
   FormControl,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import {
   User,
@@ -18,6 +19,7 @@ import {
   Phone,
   CheckCircle,
 } from "lucide-react";
+import OTPModal from "./OTPModal";
 
 // Color constants
 const COLORS = {
@@ -56,6 +58,8 @@ export default function InputBox({
   const [internalValue, setInternalValue] = useState("");
   const [internalError, setInternalError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [showOTPModal, setShowOTPModal] = useState(false);
 
   // external or internal state
   const value = externalValue ?? internalValue;
@@ -190,6 +194,27 @@ export default function InputBox({
   const togglePasswordVisibility = useCallback(() => {
     setShowPassword((prev) => !prev);
   }, []);
+
+  const handleVerifyClick = useCallback(() => {
+    if (type === "phone" && onVerify) {
+      setIsVerifying(true);
+      
+      // Show spinner for 2 seconds
+      setTimeout(() => {
+        setIsVerifying(false);
+        setShowOTPModal(true);
+      }, 2000);
+    }
+  }, [type, onVerify]);
+
+  const handleOTPVerify = useCallback((otp) => {
+    console.log("OTP verified:", otp);
+    setShowOTPModal(false);
+    // Here you would typically call your OTP verification API
+    if (onVerify) {
+      onVerify(value, otp);
+    }
+  }, [onVerify, value]);
 
   // styles for TextField
   const styles = {
@@ -483,9 +508,10 @@ export default function InputBox({
               ) : type === "phone" && value && value.length === 10 && /^[6-9]\d{9}$/.test(value) ? (
                 <InputAdornment position="end" sx={{ marginRight: 0 }}>
                   <Button
-                    onClick={() => onVerify && onVerify(value)}
+                    onClick={handleVerifyClick}
                     variant="contained"
                     size="small"
+                    disabled={isVerifying}
                     sx={{
                       backgroundColor: "#f97316",
                       height: 28,
@@ -500,9 +526,29 @@ export default function InputBox({
                         backgroundColor: "#ea580c",
                         boxShadow: "none",
                       },
+                      "&:disabled": {
+                        backgroundColor: "transparent",
+                        color: "white",
+                      },
                     }}
                   >
-                    Verify
+                    {isVerifying ? (
+                      <CircularProgress 
+                        size={14} 
+                        sx={{ 
+                          color: "#0A7EA4",
+                          backgroundColor: "transparent",
+                          "& .MuiCircularProgress-circle": {
+                            strokeLinecap: "round",
+                          },
+                          "& .MuiCircularProgress-root": {
+                            backgroundColor: "transparent",
+                          },
+                        }} 
+                      />
+                    ) : (
+                      "Verify"
+                    )}
                   </Button>
                 </InputAdornment>
               ) : null}
@@ -517,6 +563,13 @@ export default function InputBox({
           {getErrorMessage()}
         </p>
       )}
+      
+      <OTPModal
+        open={showOTPModal}
+        onClose={() => setShowOTPModal(false)}
+        phoneNumber={value}
+        onVerify={handleOTPVerify}
+      />
     </div>
   );
 }
