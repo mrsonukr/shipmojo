@@ -249,11 +249,11 @@ const Register = () => {
               />
               <span className="text-xs text-gray-700 leading-relaxed">
                 I agree to the{' '}
-                <button className="text-primary underline cursor-pointer">
+                <button className="text-xs font-medium underline text-gray-700 cursor-pointer">
                   Terms and Conditions
                 </button>{' '}
                 &{' '}
-                <button className="text-primary underline cursor-pointer">
+                <button className="text-xs font-medium underline text-gray-700 cursor-pointer">
                   Privacy Policy
                 </button>
               </span>
