@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CircularProgress } from '@mui/material'
+import { CheckCircle } from 'lucide-react'
 import InputBox from '../components/InputBox'
 import Button from '../components/Button'
 import AuthLayout from '../components/AuthLayout'
@@ -21,6 +22,7 @@ const Register = () => {
   const [confirmPasswordError, setConfirmPasswordError] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [agreeToTerms, setAgreeToTerms] = useState(false)
+  const [isPhoneVerified, setIsPhoneVerified] = useState(false)
 
   const handleRegister = async () => {
     // Validate fields
@@ -61,6 +63,11 @@ const Register = () => {
 
   const handleLogin = () => {
     navigate('/login')
+  }
+
+  const handlePhoneVerification = (phoneNumber) => {
+    // Just mark as verified without sending OTP
+    setIsPhoneVerified(true)
   }
 
   const handleTrackOrder = () => {
@@ -118,17 +125,28 @@ const Register = () => {
               error={phoneError}
               onErrorChange={setPhoneError}
               required={true}
+              onVerify={handlePhoneVerification}
             />
 
             {/* Password */}
-            <InputBox
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              error={passwordError}
-              onErrorChange={setPasswordError}
-              required={true}
-            />
+            <div>
+              <InputBox
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                error={false}
+                onErrorChange={setPasswordError}
+                required={true}
+              />
+              <p className="text-[10px] text-gray-500 mt-1">
+                Password: Min 8 characters, 1 Uppercase, 1 Lowercase, 1 Number and 1 Special Character
+              </p>
+              {passwordError && (
+                <p className="text-[10px] text-orange-500 mt-1">
+                  Enter a valid password
+                </p>
+              )}
+            </div>
 
             {/* Confirm Password */}
             <InputBox

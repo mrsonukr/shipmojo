@@ -7,6 +7,7 @@ import {
   Select,
   MenuItem,
   FormControl,
+  Button,
 } from "@mui/material";
 import {
   User,
@@ -15,6 +16,7 @@ import {
   EyeOff,
   LockKeyhole,
   Phone,
+  CheckCircle,
 } from "lucide-react";
 
 // Color constants
@@ -48,6 +50,7 @@ export default function InputBox({
   showPasswordToggle = true, // Only for password
   required = false,
   options = [], // For select type
+  onVerify, // For phone verification
   ...props
 }) {
   const [internalValue, setInternalValue] = useState("");
@@ -112,7 +115,7 @@ export default function InputBox({
         );
       }
       if (type === "phone") {
-        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+        const phoneRegex = /^[6-9]\d{9}$/;
         return val.trim() === "" || !phoneRegex.test(val);
       }
       if (type === "name") {
@@ -132,11 +135,36 @@ export default function InputBox({
 
   const handleChange = useCallback(
     (e) => {
-      const newValue = e.target.value;
+      let newValue = e.target.value;
+      
+      // Phone number validation and formatting
+      if (type === "phone") {
+        // Remove ALL non-numeric characters immediately
+        newValue = newValue.replace(/[^0-9]/g, '');
+        
+        // Limit to exactly 10 digits
+        if (newValue.length > 10) {
+          newValue = newValue.slice(0, 10);
+        }
+        
+        // Check if starts with valid digit (6, 7, 8, 9)
+        if (newValue.length > 0 && !/^[6-9]/.test(newValue)) {
+          newValue = '';
+        }
+      }
+      
       const newError = validateField(newValue);
 
       if (externalOnChange) {
-        externalOnChange(e);
+        // Create a new event with the cleaned value
+        const newEvent = {
+          ...e,
+          target: {
+            ...e.target,
+            value: newValue
+          }
+        };
+        externalOnChange(newEvent);
       } else {
         setInternalValue(newValue);
       }
@@ -147,7 +175,7 @@ export default function InputBox({
         setInternalError(newError);
       }
     },
-    [externalOnChange, onErrorChange, validateField]
+    [externalOnChange, onErrorChange, validateField, type]
   );
 
   const handleBlur = useCallback(() => {
@@ -382,7 +410,9 @@ export default function InputBox({
         id={`input-${type}`}
         name={`input-${type}`}
         type={
-          type === "password" || type === "confirmPassword"
+          type === "phone" 
+            ? "tel"
+            : type === "password" || type === "confirmPassword"
             ? showPassword
               ? "text"
               : "password"
@@ -394,7 +424,12 @@ export default function InputBox({
         value={value}
         onChange={handleChange}
         onBlur={handleBlur}
-        inputProps={{ maxLength: 100 }}
+        inputProps={{ 
+          maxLength: type === "phone" ? 10 : 100,
+          pattern: type === "phone" ? "[6-9][0-9]{9}" : undefined,
+          inputMode: type === "phone" ? "numeric" : "text",
+          type: type === "phone" ? "tel" : "text"
+        }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start" sx={{ marginRight: 0 }}>
@@ -411,40 +446,68 @@ export default function InputBox({
               )}
             </InputAdornment>
           ),
-          endAdornment:
-            type === "password" && showPasswordToggle ? (
-              <InputAdornment position="end" sx={{ marginRight: 0 }}>
-                <Box
-                  sx={{
-                    backgroundColor: COLORS.background,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: 42,
-                    height: 42,
-                    borderTopRightRadius: "8px",
-                    borderBottomRightRadius: "8px",
-                  }}
-                >
-                  <IconButton
-                    onClick={togglePasswordVisibility}
-                    edge="end"
+          endAdornment: (
+            <>
+              {type === "password" && showPasswordToggle ? (
+                <InputAdornment position="end" sx={{ marginRight: 0 }}>
+                  <Box
+                    sx={{
+                      backgroundColor: COLORS.background,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 42,
+                      height: 42,
+                      borderTopRightRadius: "8px",
+                      borderBottomRightRadius: "8px",
+                    }}
+                  >
+                    <IconButton
+                      onClick={togglePasswordVisibility}
+                      edge="end"
+                      size="small"
+                      sx={{
+                        padding: "8px",
+                        "& .MuiTouchRipple-root": {
+                          borderRadius: "16px",
+                        },
+                        "&:hover": {
+                          backgroundColor: "rgba(0, 0, 0, 0.04)",
+                        },
+                      }}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </IconButton>
+                  </Box>
+                </InputAdornment>
+              ) : type === "phone" && value && value.length === 10 && /^[6-9]\d{9}$/.test(value) ? (
+                <InputAdornment position="end" sx={{ marginRight: 0 }}>
+                  <Button
+                    onClick={() => onVerify && onVerify(value)}
+                    variant="contained"
                     size="small"
                     sx={{
-                      padding: "8px",
-                      "& .MuiTouchRipple-root": {
-                        borderRadius: "16px",
-                      },
+                      backgroundColor: "#f97316",
+                      height: 28,
+                      fontSize: "11px",
+                      padding: "0 16px",
+                      marginRight: "-5px",
+                      borderRadius: "50px",
+                      textTransform: "none",
+                      minWidth: "auto",
+                      boxShadow: "none",
                       "&:hover": {
-                        backgroundColor: "rgba(0, 0, 0, 0.04)",
+                        backgroundColor: "#ea580c",
+                        boxShadow: "none",
                       },
                     }}
                   >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </IconButton>
-                </Box>
-              </InputAdornment>
-            ) : null,
+                    Verify
+                  </Button>
+                </InputAdornment>
+              ) : null}
+            </>
+          ),
         }}
         sx={styles}
         {...props}
