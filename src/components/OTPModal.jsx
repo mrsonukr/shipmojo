@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { IconButton } from "@mui/material";
+import React, { useState, useEffect, useCallback } from "react";
+import { IconButton, CircularProgress } from "@mui/material";
 import { X } from "lucide-react";
 import OtpInput from "react-otp-input";
 import PopupModal from "./PopupModal";
@@ -9,43 +9,89 @@ export default function OTPModal({ open, onClose, phoneNumber, onVerify }) {
   const [otp, setOtp] = useState("");
   const [timeLeft, setTimeLeft] = useState(59);
   const [isResendDisabled, setIsResendDisabled] = useState(true);
+  const [isVerifying, setIsVerifying] = useState(false);
 
+  // Reset state when modal opens
   useEffect(() => {
     if (open) {
       setTimeLeft(59);
       setIsResendDisabled(true);
       setOtp("");
+      setIsVerifying(false);
     }
   }, [open]);
 
+  // Timer effect
   useEffect(() => {
     let timer;
     if (timeLeft > 0 && isResendDisabled) {
-      timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      timer = setTimeout(() => setTimeLeft(prev => prev - 1), 1000);
     } else if (timeLeft === 0) {
       setIsResendDisabled(false);
     }
     return () => clearTimeout(timer);
   }, [timeLeft, isResendDisabled]);
 
-  const handleOtpChange = (value) => {
+  const handleOtpChange = useCallback((value) => {
     setOtp(value);
-  };
+  }, []);
 
-  const handleResend = () => {
+  const handleResend = useCallback(() => {
     setTimeLeft(59);
     setIsResendDisabled(true);
     console.log("Resending OTP...");
-  };
+  }, []);
 
-  const handleVerify = () => {
-    onVerify(otp);
-  };
+  const handleVerify = useCallback(() => {
+    if (!otp || otp.length !== 6) return;
+    
+    setIsVerifying(true);
+    setTimeout(() => {
+      setIsVerifying(false);
+      onVerify(otp);
+    }, 2000);
+  }, [otp, onVerify]);
 
-  const formatTime = (seconds) => {
+  const formatTime = useCallback((seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, "0")}`;
+  }, []);
+
+  const buttonStyles = {
+    height: "32px !important",
+    padding: "6px 20px !important",
+    fontSize: "12px !important",
+    borderRadius: "6px !important",
+    backgroundColor: "#0A7EA4 !important",
+    color: "white !important",
+    boxShadow: "none !important",
+    textTransform: "none !important",
+    "&:hover": {
+      backgroundColor: "#086a8a !important",
+      boxShadow: "none !important"
+    }
+  };
+
+  const inputStyles = {
+    flex: 1,
+    minWidth: "36px",
+    maxWidth: "56px",
+    height: "42px",
+    border: "1px solid #d1d5db",
+    borderRadius: "6px",
+    textAlign: "center",
+    fontSize: "16px",
+    fontWeight: 600,
+    outline: "none",
+    transition: "border-color 0.2s",
+  };
+
+  const containerStyles = {
+    display: "flex",
+    gap: "4px",
+    justifyContent: "center",
+    width: "100%",
   };
 
   return (
@@ -67,7 +113,6 @@ export default function OTPModal({ open, onClose, phoneNumber, onVerify }) {
           <X size={18} />
         </IconButton>
       </div>
-
 
       {/* Content */}
       <div className="px-6 py-4">
@@ -91,19 +136,7 @@ export default function OTPModal({ open, onClose, phoneNumber, onVerify }) {
               renderInput={(props) => (
                 <input
                   {...props}
-                  style={{
-                    flex: 1, // equal width, auto adjust inside flex
-                    minWidth: "36px", // chhoti screen me bhi readable
-                    maxWidth: "56px", // bahut bada na ho
-                    height: "42px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "6px",
-                    textAlign: "center",
-                    fontSize: "16px",
-                    fontWeight: 600,
-                    outline: "none",
-                    transition: "border-color 0.2s",
-                  }}
+                  style={inputStyles}
                   onFocus={(e) => {
                     e.target.style.borderColor = "#0A7EA4";
                     e.target.style.borderWidth = "2px";
@@ -114,14 +147,8 @@ export default function OTPModal({ open, onClose, phoneNumber, onVerify }) {
                   }}
                 />
               )}
-              containerStyle={{
-                display: "flex",
-                gap: "4px",
-                justifyContent: "center",
-                width: "100%", // take full popup width
-              }}
+              containerStyle={containerStyles}
             />
-
           </div>
         </div>
 
@@ -158,9 +185,13 @@ export default function OTPModal({ open, onClose, phoneNumber, onVerify }) {
           onClick={handleVerify}
           variant="filled"
           color="primary"
-          className="h-8 px-6 rounded-md font-medium text-white text-xs bg-[#0A7EA4] hover:bg-[#086885]"
+          disabled={isVerifying || !otp || otp.length !== 6}
+          sx={buttonStyles}
         >
-          Verify and Continue
+          <div className="flex items-center space-x-2">
+            {isVerifying && <CircularProgress size={14} sx={{ color: 'white' }} />}
+            <span>Verify and Continue</span>
+          </div>
         </Button>
       </div>
     </PopupModal>
