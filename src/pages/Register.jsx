@@ -9,12 +9,14 @@ import AuthLayout from '../components/AuthLayout'
 const Register = () => {
   const navigate = useNavigate()
   const [userType, setUserType] = useState('individual')
+  const [companyName, setCompanyName] = useState('')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [userTypeError, setUserTypeError] = useState(false)
+  const [companyNameError, setCompanyNameError] = useState(false)
   const [nameError, setNameError] = useState(false)
   const [emailError, setEmailError] = useState(false)
   const [phoneError, setPhoneError] = useState(false)
@@ -31,6 +33,7 @@ const Register = () => {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     
     const userTypeValid = userType.trim() !== ''
+    const companyNameValid = userType === 'business' ? companyName.trim() !== '' : true
     const nameValid = name.trim() !== ''
     const emailValid = email.trim() !== '' && emailRegex.test(email)
     const phoneValid = phone.trim() !== '' && phoneRegex.test(phone)
@@ -39,13 +42,14 @@ const Register = () => {
     const termsValid = agreeToTerms
 
     setUserTypeError(!userTypeValid)
+    setCompanyNameError(!companyNameValid)
     setNameError(!nameValid)
     setEmailError(!emailValid)
     setPhoneError(!phoneValid)
     setPasswordError(!passwordValid)
     setConfirmPasswordError(!confirmPasswordValid)
 
-    if (userTypeValid && nameValid && emailValid && phoneValid && passwordValid && confirmPasswordValid && termsValid) {
+    if (userTypeValid && companyNameValid && nameValid && emailValid && phoneValid && passwordValid && confirmPasswordValid && termsValid) {
       setIsLoading(true)
 
       // Simulate API call
@@ -96,6 +100,20 @@ const Register = () => {
                 { value: "business", label: "Business" }
               ]}
             />
+
+            {/* Company Name - Only show when business is selected */}
+            {userType === 'business' && (
+              <InputBox
+                type="name"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                error={companyNameError}
+                onErrorChange={setCompanyNameError}
+                required={true}
+                label="Company name"
+                placeholder="Enter your company name"
+              />
+            )}
 
             {/* Name */}
             <InputBox

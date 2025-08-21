@@ -44,7 +44,7 @@ export default function OTPModal({ open, onClose, phoneNumber, onVerify }) {
 
   const handleVerify = useCallback(() => {
     if (!otp || otp.length !== 6) return;
-    
+
     setIsVerifying(true);
     setTimeout(() => {
       setIsVerifying(false);
