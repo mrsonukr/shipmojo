@@ -85,29 +85,7 @@ const Home = () => {
                 ))}
                         </div>
             
-            {/* Date Range Picker Section
-            <div className="mt-6 mb-4">
-                <Button
-                    variant="outlined"
-                    startIcon={<Calendar size={20} />}
-                    onClick={() => setIsDatePickerOpen(true)}
-                    sx={{
-                        borderColor: '#0A7EA4',
-                        color: '#0A7EA4',
-                        '&:hover': {
-                            borderColor: '#0A7EA4',
-                            backgroundColor: '#0A7EA410'
-                        }
-                    }}
-                >
-                    Select Date Range
-                </Button> */}
-            {/* </div> */}
-            
-            {/* <DateRangePicker 
-                open={isDatePickerOpen} 
-                onClose={() => setIsDatePickerOpen(false)}
-            /> */}
+           
         </div>
     )
 }

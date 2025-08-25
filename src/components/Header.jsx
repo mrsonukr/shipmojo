@@ -62,6 +62,12 @@ export default function Header() {
                             </Typography>
                         </Box>
                     </Box>
+                    <div className="w-[24px] h-[24px]">
+                        <img src="https://panel.shipmozo.com/images/svgs/warn-alert.svg" alt="" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-primary">Notification Credits: 0</p>
+                    </div>
 
                 </div>
 
